@@ -1,4 +1,4 @@
-# MediHub Landing Page
+# MediHub
 
 A modern, clean, and professional landing page for MediHub - A Health Record System. Built with React 18, Vite, and TailwindCSS.
 
