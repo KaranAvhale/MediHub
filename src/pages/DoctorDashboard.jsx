@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabaseClient'
 import DoctorNavbar from '../components/DoctorNavbar'
 import AttendPatientModal from '../components/AttendPatientModal'
 import PatientDetailsView from '../components/PatientDetailsView'
+import DoctorEditProfileModal from '../components/DoctorEditProfileModal'
 
 const DoctorDashboard = () => {
   const { user: clerkUser } = useUser()
@@ -15,6 +16,7 @@ const DoctorDashboard = () => {
   const [error, setError] = useState('')
   const [currentView, setCurrentView] = useState('dashboard') // dashboard, personal-info, patient-details
   const [showAttendModal, setShowAttendModal] = useState(false)
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false)
   const [selectedPatient, setSelectedPatient] = useState(null)
   const [attendedPatients, setAttendedPatients] = useState([])
 
@@ -42,6 +44,8 @@ const DoctorDashboard = () => {
         if (error) throw error
         if (data) {
           console.log('Doctor data from database:', JSON.stringify(data, null, 2));
+          console.log('Qualifications type:', typeof data.qualifications, 'Value:', data.qualifications);
+          console.log('Hospitals type:', typeof data.hospitals, 'Value:', data.hospitals);
           setDoctorData(data)
           // Fetch recent patient visits for this doctor
           await fetchRecentVisits(data.id)
@@ -294,6 +298,11 @@ const DoctorDashboard = () => {
   const handleBackToDashboard = () => {
     setCurrentView('dashboard')
     setSelectedPatient(null)
+  }
+
+  const handleProfileUpdate = (updatedData) => {
+    console.log('Profile updated with data:', updatedData)
+    setDoctorData(updatedData)
   }
 
   if (!clerkUser && !loading) {
@@ -643,7 +652,7 @@ const DoctorDashboard = () => {
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
                     <div className="space-y-3">
                       <button
-                        onClick={() => navigate('/profile/doctor')}
+                        onClick={() => setShowEditProfileModal(true)}
                         className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center"
                       >
                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -684,6 +693,14 @@ const DoctorDashboard = () => {
         isOpen={showAttendModal}
         onClose={() => setShowAttendModal(false)}
         onAadharSubmit={handleAadharSubmit}
+      />
+
+      {/* Edit Profile Modal */}
+      <DoctorEditProfileModal
+        isOpen={showEditProfileModal}
+        onClose={() => setShowEditProfileModal(false)}
+        doctorData={doctorData}
+        onUpdate={handleProfileUpdate}
       />
     </div>
   )

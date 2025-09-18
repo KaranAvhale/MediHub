@@ -104,10 +104,23 @@ const HospitalReports = ({ hospitalData }) => {
         setAdmittedPatients(transformedPatients)
       }
 
-      // Fetch vaccination records from patients table
+      // Fetch vaccination records from patients table - filter by hospital
+      // First, get all patients who have been admitted to this hospital
+      const { data: hospitalPatients, error: hospitalPatientsError } = await supabase
+        .from('hospital_admissions')
+        .select('patient_id')
+        .eq('hospital_id', hospitalData?.id)
+
+      let patientIds = []
+      if (!hospitalPatientsError && hospitalPatients) {
+        patientIds = [...new Set(hospitalPatients.map(admission => admission.patient_id))]
+      }
+
+      // Now fetch vaccination records only for patients who have been to this hospital
       const { data: patientsWithVaccinations, error: vaccinationError } = await supabase
         .from('patients')
         .select('id, name, age, patient_vaccinations')
+        .in('id', patientIds.length > 0 ? patientIds : [-1]) // Use -1 if no patients found to return empty result
         .not('patient_vaccinations', 'is', null)
 
       if (vaccinationError) {
@@ -287,9 +300,10 @@ const HospitalReports = ({ hospitalData }) => {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Statistics Cards */}
-      <div className={`grid grid-cols-1 gap-6 ${isMaternityHospital ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="space-y-8">
+        {/* Statistics Cards */}
+        <div className={`grid grid-cols-1 gap-8 ${isMaternityHospital ? 'lg:grid-cols-2 xl:grid-cols-3' : 'lg:grid-cols-2'}`}>
         <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
@@ -335,8 +349,8 @@ const HospitalReports = ({ hospitalData }) => {
         )}
       </div>
 
-      {/* Main Dashboard Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+        {/* Main Dashboard Sections */}
+        <div className={`grid grid-cols-1 gap-8 ${isMaternityHospital ? 'lg:grid-cols-2 xl:grid-cols-3' : 'lg:grid-cols-2'}`}>
         
         {/* Section 1: Admit Patient */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-200">
@@ -492,7 +506,7 @@ const HospitalReports = ({ hospitalData }) => {
           </div>
         </div>
 
-        {/* Section 3: Child ID (Only for Maternity Hospitals) */}
+          {/* Section 3: Child ID (Only for Maternity Hospitals) */}
         {isMaternityHospital && (
           <div className="bg-white rounded-xl shadow-lg border border-gray-200">
             <div className="p-6 border-b border-gray-200">
@@ -555,6 +569,7 @@ const HospitalReports = ({ hospitalData }) => {
             </div>
           </div>
         )}
+        </div>
       </div>
 
       {/* Modals */}
