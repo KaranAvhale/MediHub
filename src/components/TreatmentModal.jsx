@@ -185,7 +185,7 @@ const TreatmentModal = ({
         : []
 
       const treatmentData = {
-        id: treatment?.id || Date.now().toString(),
+        id: treatment?.id || `treatment_${Date.now()}`,
         treatmentName: formData.treatmentName,
         description: formData.description,
         startDate: formData.startDate,
@@ -199,11 +199,16 @@ const TreatmentModal = ({
 
       if (treatment) {
         // Update existing treatment - move current to history and save new as current
-        const treatmentIndex = updatedTreatments.findIndex(t => 
-          t.id === treatment.id || 
-          t.treatmentName === treatment.treatmentName ||
-          t.name === treatment.name
-        )
+        const treatmentIndex = updatedTreatments.findIndex(t => {
+          // First try to match by ID if both have IDs
+          if (treatment.id && t.id) {
+            return t.id === treatment.id
+          }
+          // Fallback to name matching
+          const treatmentName = treatment.treatmentName || treatment.name
+          const currentName = t.treatmentName || t.name
+          return treatmentName && currentName && treatmentName === currentName
+        })
         
         if (treatmentIndex !== -1) {
           // Move current treatment to history before updating (add to beginning for stack behavior)
@@ -213,12 +218,25 @@ const TreatmentModal = ({
             movedToHistoryAt: new Date().toISOString()
           }
           
+          console.log('=== TREATMENT UPDATE DEBUG ===');
+          console.log('Updating treatment at index:', treatmentIndex);
+          console.log('Original treatment:', updatedTreatments[treatmentIndex]);
+          console.log('New treatment data:', treatmentData);
+          console.log('Moving to history:', currentTreatmentData);
+          
           // Add to beginning of history array (stack behavior - most recent first)
           updatedTreatmentHistory.unshift(currentTreatmentData)
           
-          // Update current treatment with new data
+          // Replace the existing treatment with updated data (maintain same position)
           updatedTreatments[treatmentIndex] = treatmentData
+          
+          console.log('Updated treatments array length:', updatedTreatments.length);
+          console.log('Updated history array length:', updatedTreatmentHistory.length);
         } else {
+          console.log('=== TREATMENT NOT FOUND - ADDING AS NEW ===');
+          console.log('Looking for treatment:', treatment);
+          console.log('In treatments array:', updatedTreatments);
+          // If treatment not found in ongoing treatments, add as new
           updatedTreatments.push(treatmentData)
         }
       } else {

@@ -33,6 +33,17 @@ const PatientDetailsView = ({ patient, onBack }) => {
       if (error) throw error
 
       if (updatedPatient) {
+        // Ensure all ongoing treatments have proper IDs
+        const ongoingTreatments = Array.isArray(updatedPatient.ongoing_treatments) 
+          ? updatedPatient.ongoing_treatments.map(treatment => ({
+              ...treatment,
+              id: treatment.id || `treatment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+            }))
+          : (updatedPatient.ongoing_treatments ? [{
+              ...updatedPatient.ongoing_treatments,
+              id: updatedPatient.ongoing_treatments.id || `treatment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+            }] : [])
+
         const transformedPatient = {
           aadhar: updatedPatient.aadhar_number,
           name: updatedPatient.name,
@@ -42,12 +53,8 @@ const PatientDetailsView = ({ patient, onBack }) => {
           bloodGroup: updatedPatient.blood_group,
           dob: updatedPatient.dob,
           address: updatedPatient.address,
-          ongoing_treatments: Array.isArray(updatedPatient.ongoing_treatments) 
-            ? updatedPatient.ongoing_treatments 
-            : (updatedPatient.ongoing_treatments ? [updatedPatient.ongoing_treatments] : []),
-          ongoingTreatment: Array.isArray(updatedPatient.ongoing_treatments) 
-            ? updatedPatient.ongoing_treatments 
-            : (updatedPatient.ongoing_treatments ? [updatedPatient.ongoing_treatments] : []),
+          ongoing_treatments: ongoingTreatments,
+          ongoingTreatment: ongoingTreatments,
           ongoingTreatmentPast: Array.isArray(updatedPatient.ongoing_treatment_past) 
             ? updatedPatient.ongoing_treatment_past 
             : (updatedPatient.ongoing_treatment_past ? [updatedPatient.ongoing_treatment_past] : []),
@@ -687,7 +694,7 @@ const PatientDetailsView = ({ patient, onBack }) => {
                     })
                     .map((treatment, index) => (
                     <TreatmentCard
-                      key={index}
+                      key={treatment.id || treatment.treatmentName || treatment.name || index}
                       treatment={treatment}
                       index={index}
                       onEdit={handleEditTreatment}
@@ -733,7 +740,7 @@ const PatientDetailsView = ({ patient, onBack }) => {
                     })
                     .map((treatment, index) => (
                     <PastTreatmentCard
-                      key={index}
+                      key={treatment.id || treatment.treatmentName || treatment.name || index}
                       treatment={treatment}
                       index={index}
                       onViewDetails={handleViewPastTreatment}
