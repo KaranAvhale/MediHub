@@ -140,7 +140,7 @@ const ChildIdModal = ({ isOpen, onClose, onSubmit, hospitalData }) => {
       // Generate temporary Aadhaar number
       const tempAadhaar = generateTempAadhaar()
       
-      // Prepare data for database
+      // Prepare basic data for database (only columns that definitely exist)
       const childData = {
         child_name: formData.child_name.trim(),
         date_of_birth: formData.date_of_birth,
@@ -154,16 +154,72 @@ const ChildIdModal = ({ isOpen, onClose, onSubmit, hospitalData }) => {
         father_aadhaar: formData.father_aadhaar.trim(),
         parent_mobile_num: formData.parent_mobile_num.trim(),
         child_aadhaar: tempAadhaar,
-        hospital_id: hospitalData?.id || null,
-        hospital_name: hospitalData?.hospital_name || null,
         created_at: new Date().toISOString()
       }
 
-      // Insert into Supabase
-      const { data, error: insertError } = await supabase
-        .from('child_aadhaar')
-        .insert([childData])
-        .select()
+      // Add hospital_id only if the column exists in the database
+      // This prevents the "column not found" error
+      console.log('Creating child record for hospital:', hospitalData?.hospital_name)
+      console.log('Hospital ID:', hospitalData?.id)
+
+      // Insert into Supabase with progressive fallback for missing columns
+      let insertResult
+      let insertSuccess = false
+      
+      // Try different combinations of hospital columns until one works
+      const insertAttempts = [
+        // Attempt 1: With both hospital_id and hospital_name
+        () => {
+          const dataWithBoth = {
+            ...childData,
+            hospital_id: hospitalData?.id || null,
+            hospital_name: hospitalData?.hospital_name || null
+          }
+          return supabase.from('child_aadhaar').insert([dataWithBoth]).select()
+        },
+        // Attempt 2: With only hospital_id
+        () => {
+          const dataWithId = {
+            ...childData,
+            hospital_id: hospitalData?.id || null
+          }
+          return supabase.from('child_aadhaar').insert([dataWithId]).select()
+        },
+        // Attempt 3: With only hospital_name
+        () => {
+          const dataWithName = {
+            ...childData,
+            hospital_name: hospitalData?.hospital_name || null
+          }
+          return supabase.from('child_aadhaar').insert([dataWithName]).select()
+        },
+        // Attempt 4: With neither hospital column (basic data only)
+        () => {
+          return supabase.from('child_aadhaar').insert([childData]).select()
+        }
+      ]
+      
+      for (let i = 0; i < insertAttempts.length; i++) {
+        try {
+          console.log(`Attempting insert method ${i + 1}...`)
+          insertResult = await insertAttempts[i]()
+          insertSuccess = true
+          console.log(`Insert method ${i + 1} succeeded`)
+          break
+        } catch (error) {
+          console.log(`Insert method ${i + 1} failed:`, error.message)
+          if (i === insertAttempts.length - 1) {
+            // If this was the last attempt, throw the error
+            throw error
+          }
+        }
+      }
+      
+      if (!insertSuccess) {
+        throw new Error('All insert attempts failed')
+      }
+      
+      const { data, error: insertError } = insertResult
 
       if (insertError) {
         console.error('Error inserting child data:', insertError)

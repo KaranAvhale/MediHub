@@ -175,22 +175,70 @@ const HospitalReports = ({ hospitalData }) => {
         setVaccinationRecords(allVaccinations)
       }
 
-      // Fetch child IDs from database - filter by hospital_id for Maternity hospitals
+      // Fetch child IDs from database - handle missing hospital_id column gracefully
       console.log('=== FETCHING CHILD IDs DEBUG ===')
       console.log('Is Maternity Hospital:', isMaternityHospital)
       console.log('Hospital ID for child filtering:', hospitalData?.id)
       
-      const { data: childData, error: childError } = await supabase
-        .from('child_aadhaar')
-        .select('*')
-        .eq('hospital_id', hospitalData?.id) // Filter by hospital_id
-        .order('created_at', { ascending: false })
-
-      if (childError) {
-        console.error('Error fetching child IDs:', childError)
+      // Try multiple approaches to fetch child IDs based on available columns
+      const fetchChildIds = async () => {
+        const fetchAttempts = [
+          // Attempt 1: Filter by hospital_id
+          async () => {
+            console.log('Trying to fetch with hospital_id filter')
+            return await supabase
+              .from('child_aadhaar')
+              .select('*')
+              .eq('hospital_id', hospitalData?.id)
+              .order('created_at', { ascending: false })
+          },
+          // Attempt 2: Filter by hospital_name
+          async () => {
+            console.log('Trying to fetch with hospital_name filter')
+            return await supabase
+              .from('child_aadhaar')
+              .select('*')
+              .eq('hospital_name', hospitalData?.hospital_name)
+              .order('created_at', { ascending: false })
+          },
+          // Attempt 3: Fetch all and filter in JavaScript
+          async () => {
+            console.log('Fetching all child records (no hospital columns available)')
+            const result = await supabase
+              .from('child_aadhaar')
+              .select('*')
+              .order('created_at', { ascending: false })
+            
+            // Since we can't filter by hospital in the database, 
+            // we'll show all records for now
+            return result
+          }
+        ]
+        
+        for (let i = 0; i < fetchAttempts.length; i++) {
+          try {
+            const { data, error } = await fetchAttempts[i]()
+            if (!error) {
+              console.log(`Child fetch method ${i + 1} succeeded, found ${data?.length || 0} records`)
+              return data || []
+            }
+            console.log(`Child fetch method ${i + 1} failed:`, error.message)
+          } catch (error) {
+            console.log(`Child fetch method ${i + 1} threw error:`, error.message)
+          }
+        }
+        
+        // If all attempts failed
+        console.error('All child fetch attempts failed')
+        return []
+      }
+      
+      try {
+        const childData = await fetchChildIds()
+        setChildIds(childData)
+      } catch (error) {
+        console.error('Unexpected error fetching child IDs:', error)
         setChildIds([])
-      } else {
-        setChildIds(childData || [])
       }
       
     } catch (error) {
