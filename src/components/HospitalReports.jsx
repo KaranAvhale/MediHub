@@ -104,53 +104,86 @@ const HospitalReports = ({ hospitalData }) => {
         setAdmittedPatients(transformedPatients)
       }
 
-      // Fetch vaccination records from patients table - filter by hospital
-      // First, get all patients who have been admitted to this hospital
-      const { data: hospitalPatients, error: hospitalPatientsError } = await supabase
-        .from('hospital_admissions')
-        .select('patient_id')
-        .eq('hospital_id', hospitalData?.id)
-
-      let patientIds = []
-      if (!hospitalPatientsError && hospitalPatients) {
-        patientIds = [...new Set(hospitalPatients.map(admission => admission.patient_id))]
-      }
-
-      // Now fetch vaccination records only for patients who have been to this hospital
+      // Fetch vaccination records from patients table - filter by hospital_id in vaccination records
+      console.log('=== FETCHING VACCINATION RECORDS DEBUG ===')
+      console.log('Current hospital ID:', hospitalData?.id)
+      
+      // Fetch all patients who have vaccination records
       const { data: patientsWithVaccinations, error: vaccinationError } = await supabase
         .from('patients')
         .select('id, name, age, patient_vaccinations')
-        .in('id', patientIds.length > 0 ? patientIds : [-1]) // Use -1 if no patients found to return empty result
         .not('patient_vaccinations', 'is', null)
 
       if (vaccinationError) {
         console.error('Error fetching vaccination records:', vaccinationError)
         setVaccinationRecords([])
       } else {
-        // Transform vaccination data for display
+        // Transform vaccination data and filter by hospital_id
         const allVaccinations = []
         patientsWithVaccinations?.forEach(patient => {
           if (patient.patient_vaccinations && Array.isArray(patient.patient_vaccinations)) {
             patient.patient_vaccinations.forEach(vaccination => {
-              allVaccinations.push({
-                ...vaccination,
-                patient_name: patient.name,
-                patient_age: patient.age,
-                patient_id: patient.id
+              console.log('Checking vaccination record:', {
+                vaccinationId: vaccination.id,
+                vaccinationHospitalId: vaccination.hospital_id,
+                currentHospitalId: hospitalData?.id,
+                match: vaccination.hospital_id === hospitalData?.id,
+                vaccineName: vaccination.vaccine_name,
+                patientName: patient.name
               })
+              
+              // Only include vaccinations administered by this hospital
+              // Handle both string and number hospital_id comparisons
+              const vaccinationHospitalId = vaccination.hospital_id
+              const currentHospitalId = hospitalData?.id
+              
+              // Skip vaccinations without hospital_id (legacy records) or null values
+              if (!vaccinationHospitalId || !currentHospitalId) {
+                console.log('Skipping vaccination - missing hospital_id:', {
+                  vaccinationHospitalId,
+                  currentHospitalId,
+                  vaccineName: vaccination.vaccine_name
+                })
+                return
+              }
+              
+              // Compare as strings to handle type mismatches
+              if (String(vaccinationHospitalId) === String(currentHospitalId)) {
+                console.log('Including vaccination for hospital:', vaccination.vaccine_name)
+                allVaccinations.push({
+                  ...vaccination,
+                  patient_name: patient.name,
+                  patient_age: patient.age,
+                  patient_id: patient.id
+                })
+              } else {
+                console.log('Excluding vaccination from different hospital:', {
+                  vaccineName: vaccination.vaccine_name,
+                  vaccinationHospitalId,
+                  currentHospitalId
+                })
+              }
             })
           }
         })
+        
+        console.log('Filtered vaccinations for hospital:', allVaccinations)
+        console.log('Total vaccination records for this hospital:', allVaccinations.length)
         
         // Sort by vaccination date (most recent first)
         allVaccinations.sort((a, b) => new Date(b.vaccination_date) - new Date(a.vaccination_date))
         setVaccinationRecords(allVaccinations)
       }
 
-      // Fetch child IDs from database
+      // Fetch child IDs from database - filter by hospital_id for Maternity hospitals
+      console.log('=== FETCHING CHILD IDs DEBUG ===')
+      console.log('Is Maternity Hospital:', isMaternityHospital)
+      console.log('Hospital ID for child filtering:', hospitalData?.id)
+      
       const { data: childData, error: childError } = await supabase
         .from('child_aadhaar')
         .select('*')
+        .eq('hospital_id', hospitalData?.id) // Filter by hospital_id
         .order('created_at', { ascending: false })
 
       if (childError) {
@@ -596,6 +629,7 @@ const HospitalReports = ({ hospitalData }) => {
           isOpen={showChildIdModal}
           onClose={() => setShowChildIdModal(false)}
           onSubmit={handleCreateChildId}
+          hospitalData={hospitalData}
         />
       )}
 

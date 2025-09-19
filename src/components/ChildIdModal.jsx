@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-const ChildIdModal = ({ isOpen, onClose, onSubmit }) => {
+const ChildIdModal = ({ isOpen, onClose, onSubmit, hospitalData }) => {
   const [formData, setFormData] = useState({
     child_name: '',
     date_of_birth: '',
@@ -154,6 +154,8 @@ const ChildIdModal = ({ isOpen, onClose, onSubmit }) => {
         father_aadhaar: formData.father_aadhaar.trim(),
         parent_mobile_num: formData.parent_mobile_num.trim(),
         child_aadhaar: tempAadhaar,
+        hospital_id: hospitalData?.id || null,
+        hospital_name: hospitalData?.hospital_name || null,
         created_at: new Date().toISOString()
       }
 
