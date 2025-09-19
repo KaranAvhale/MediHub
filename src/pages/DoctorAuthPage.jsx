@@ -2,6 +2,8 @@ import React from 'react'
 import { SignUp } from '@clerk/clerk-react'
 import { Link } from 'react-router-dom'
 import BackToRoles from '../components/BackToRoles'
+import TranslatedText from '../components/TranslatedText'
+import LanguageSelector from '../components/LanguageSelector'
 
 const DoctorAuthPage = () => {
   return (
@@ -18,7 +20,10 @@ const DoctorAuthPage = () => {
                 MediHub
               </h1>
             </div>
-            <BackToRoles />
+            <div className="flex items-center space-x-4">
+              <LanguageSelector variant="compact" />
+              <BackToRoles />
+            </div>
           </div>
         </div>
       </header>
@@ -37,10 +42,12 @@ const DoctorAuthPage = () => {
                   </svg>
                 </div>
                 <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-                  Join as a <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Doctor</span>
+                  <TranslatedText>Join as a</TranslatedText> <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"><TranslatedText>Doctor</TranslatedText></span>
                 </h2>
                 <p className="text-xl text-gray-600 leading-relaxed mb-8">
-                  Create your professional account to access advanced medical features, patient management, and healthcare services. Join our platform to provide exceptional healthcare and manage your patients efficiently.
+                  <TranslatedText>
+                    Create your professional account to access advanced medical features, patient management, and healthcare services. Join our platform to provide exceptional healthcare and manage your patients efficiently.
+                  </TranslatedText>
                 </p>
               </div>
             </div>

@@ -1,4 +1,6 @@
 import React from 'react'
+import TranslatedText from './TranslatedText'
+import LanguageSelector from './LanguageSelector'
 
 const HospitalNavbar = ({ currentPage, setCurrentPage, onSignOut, hospitalName }) => {
   return (
@@ -20,6 +22,7 @@ const HospitalNavbar = ({ currentPage, setCurrentPage, onSignOut, hospitalName }
 
           {/* Navigation Buttons */}
           <div className="flex items-center space-x-1">
+            <LanguageSelector variant="compact" />
             <button
               onClick={() => setCurrentPage('dashboard')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
@@ -28,7 +31,7 @@ const HospitalNavbar = ({ currentPage, setCurrentPage, onSignOut, hospitalName }
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
-              Dashboard
+              <TranslatedText>Dashboard</TranslatedText>
             </button>
             <button
               onClick={() => setCurrentPage('info')}
@@ -38,13 +41,13 @@ const HospitalNavbar = ({ currentPage, setCurrentPage, onSignOut, hospitalName }
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
-              Hospital Info
+              <TranslatedText>Hospital Info</TranslatedText>
             </button>
             <button
               onClick={onSignOut}
               className="ml-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
             >
-              Sign Out
+              <TranslatedText>Sign Out</TranslatedText>
             </button>
           </div>
         </div>

@@ -2,9 +2,15 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import PatientTreatmentHistoryModal from './PatientTreatmentHistoryModal'
 import PatientWardBedHistoryModal from './PatientWardBedHistoryModal'
+import TranslatedText from './TranslatedText'
+import { useTranslate } from '../hooks/useTranslate'
+import { useDatabaseTranslation } from '../utils/databaseTranslation'
 
 const HospitalAdmissions = ({ patientId }) => {
+  const { t } = useTranslate()
+  const { translateMedicalTerm } = useDatabaseTranslation()
   const [admissions, setAdmissions] = useState([])
+  const [translatedAdmissions, setTranslatedAdmissions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [showTreatmentHistoryModal, setShowTreatmentHistoryModal] = useState(false)
@@ -16,6 +22,49 @@ const HospitalAdmissions = ({ patientId }) => {
       fetchAdmissions()
     }
   }, [patientId])
+
+  // Function to translate admissions data
+  const translateAdmissionsData = async (admissionsData) => {
+    try {
+      const translated = await Promise.all(
+        admissionsData.map(async (admission) => {
+          const translatedAdmission = { ...admission }
+          
+          // Translate admission reason
+          if (admission.admission_reason) {
+            translatedAdmission.translatedAdmissionReason = await translateMedicalTerm(admission.admission_reason)
+          }
+          
+          // Translate diagnosis
+          if (admission.diagnosis) {
+            translatedAdmission.translatedDiagnosis = await translateMedicalTerm(admission.diagnosis)
+          }
+          
+          // Translate treatment given
+          if (admission.treatment_given) {
+            translatedAdmission.translatedTreatmentGiven = await translateMedicalTerm(admission.treatment_given)
+          }
+          
+          // Translate discharge reason
+          if (admission.discharge_reason) {
+            translatedAdmission.translatedDischargeReason = await translateMedicalTerm(admission.discharge_reason)
+          }
+          
+          // Translate hospital type
+          if (admission.hospitals?.hospital_type) {
+            translatedAdmission.translatedHospitalType = await translateMedicalTerm(admission.hospitals.hospital_type)
+          }
+          
+          return translatedAdmission
+        })
+      )
+      
+      setTranslatedAdmissions(translated)
+    } catch (error) {
+      console.error('Error translating admissions data:', error)
+      setTranslatedAdmissions(admissionsData) // Fallback to original data
+    }
+  }
 
   const fetchAdmissions = async () => {
     try {
@@ -37,14 +86,21 @@ const HospitalAdmissions = ({ patientId }) => {
 
       if (fetchError) {
         console.error('Error fetching admissions:', fetchError)
-        setError('Failed to load hospital admissions')
+        const errorMsg = await t('Failed to load hospital admissions')
+        setError(errorMsg)
         return
       }
 
       setAdmissions(data || [])
+      
+      // Translate admissions data
+      if (data && data.length > 0) {
+        translateAdmissionsData(data)
+      }
     } catch (err) {
       console.error('Error in fetchAdmissions:', err)
-      setError('Failed to load hospital admissions')
+      const errorMsg = await t('Failed to load hospital admissions')
+      setError(errorMsg)
     } finally {
       setLoading(false)
     }
@@ -72,7 +128,7 @@ const HospitalAdmissions = ({ patientId }) => {
   const getAdmissionStatus = (admission) => {
     if (admission.discharge_date) {
       return {
-        status: 'Discharged',
+        status: <TranslatedText>Discharged</TranslatedText>,
         color: 'bg-gray-100 text-gray-800',
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,7 +138,7 @@ const HospitalAdmissions = ({ patientId }) => {
       }
     }
     return {
-      status: 'Active',
+      status: <TranslatedText>Active</TranslatedText>,
       color: 'bg-green-100 text-green-800',
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,7 +161,7 @@ const HospitalAdmissions = ({ patientId }) => {
     return (
       <div className="flex items-center justify-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
-        <span className="ml-3 text-gray-600">Loading admissions...</span>
+        <span className="ml-3 text-gray-600"><TranslatedText>Loading admissions...</TranslatedText></span>
       </div>
     )
   }
@@ -131,8 +187,8 @@ const HospitalAdmissions = ({ patientId }) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
           </svg>
         </div>
-        <h4 className="text-lg font-semibold text-gray-900 mb-2">No Hospital Admissions</h4>
-        <p className="text-gray-600">You have no hospital admission records.</p>
+        <h4 className="text-lg font-semibold text-gray-900 mb-2"><TranslatedText>No Hospital Admissions</TranslatedText></h4>
+        <p className="text-gray-600"><TranslatedText>You have no hospital admission records.</TranslatedText></p>
       </div>
     )
   }
@@ -160,7 +216,7 @@ const HospitalAdmissions = ({ patientId }) => {
                   {admission.hospitals?.hospital_type || 'Hospital'} • {admission.hospitals?.address || 'Address not available'}
                 </p>
                 <p className="text-teal-600 text-sm">
-                  Reason: {admission.reason_for_admission || 'Not specified'}
+                  <TranslatedText>Reason:</TranslatedText> {admission.reason_for_admission || <TranslatedText>Not specified</TranslatedText>}
                 </p>
               </div>
             </div>
@@ -168,23 +224,23 @@ const HospitalAdmissions = ({ patientId }) => {
             {/* Admission Details */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-white rounded-lg p-3 border border-teal-200">
-                <label className="block text-xs font-medium text-teal-600 mb-1">Ward</label>
+                <label className="block text-xs font-medium text-teal-600 mb-1"><TranslatedText>Ward</TranslatedText></label>
                 <p className="font-semibold text-teal-900">{extractValue(admission.ward)}</p>
               </div>
               <div className="bg-white rounded-lg p-3 border border-teal-200">
-                <label className="block text-xs font-medium text-teal-600 mb-1">Bed Number</label>
+                <label className="block text-xs font-medium text-teal-600 mb-1"><TranslatedText>Bed Number</TranslatedText></label>
                 <p className="font-semibold text-teal-900">{extractValue(admission.bed_number)}</p>
               </div>
               <div className="bg-white rounded-lg p-3 border border-teal-200">
-                <label className="block text-xs font-medium text-teal-600 mb-1">Admitted</label>
+                <label className="block text-xs font-medium text-teal-600 mb-1"><TranslatedText>Admitted</TranslatedText></label>
                 <p className="font-semibold text-teal-900">{formatDate(admission.admission_date)}</p>
               </div>
               <div className="bg-white rounded-lg p-3 border border-teal-200">
                 <label className="block text-xs font-medium text-teal-600 mb-1">
-                  {admission.discharge_date ? 'Discharged' : 'Status'}
+                  {admission.discharge_date ? <TranslatedText>Discharged</TranslatedText> : <TranslatedText>Status</TranslatedText>}
                 </label>
                 <p className="font-semibold text-teal-900">
-                  {admission.discharge_date ? formatDate(admission.discharge_date) : 'Active'}
+                  {admission.discharge_date ? formatDate(admission.discharge_date) : <TranslatedText>Active</TranslatedText>}
                 </p>
               </div>
             </div>
@@ -198,7 +254,7 @@ const HospitalAdmissions = ({ patientId }) => {
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                Treatment History
+                <TranslatedText>Treatment History</TranslatedText>
               </button>
               
               <button
@@ -208,7 +264,7 @@ const HospitalAdmissions = ({ patientId }) => {
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Ward & Bed History
+                <TranslatedText>Ward & Bed History</TranslatedText>
               </button>
             </div>
           </div>

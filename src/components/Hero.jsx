@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import TranslatedText from './TranslatedText'
 
 const Hero = () => {
   const navigate = useNavigate()
@@ -29,15 +30,21 @@ const Hero = () => {
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">MediHub</span>
             <br />
-            <span className="text-gray-700 text-3xl sm:text-4xl lg:text-5xl">Your Health Records,</span>
+            <span className="text-gray-700 text-3xl sm:text-4xl lg:text-5xl">
+              <TranslatedText>Your Health Records,</TranslatedText>
+            </span>
             <br />
-            <span className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent text-3xl sm:text-4xl lg:text-5xl">Secured & Accessible</span>
+            <span className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent text-3xl sm:text-4xl lg:text-5xl">
+              <TranslatedText>Secured & Accessible</TranslatedText>
+            </span>
           </h1>
           
           <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Experience the future of healthcare with our secure, comprehensive platform. 
-            Connect patients, doctors, labs, and hospitals in one unified ecosystem with 
-            enterprise-grade security and seamless accessibility.
+            <TranslatedText>
+              Experience the future of healthcare with our secure, comprehensive platform. 
+              Connect patients, doctors, labs, and hospitals in one unified ecosystem with 
+              enterprise-grade security and seamless accessibility.
+            </TranslatedText>
           </p>
           
           <div className="flex justify-center mb-10">
@@ -49,7 +56,7 @@ const Hero = () => {
                 <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
-                Get Started Today
+                <TranslatedText>Get Started Today</TranslatedText>
               </span>
             </button>
           </div>
@@ -62,8 +69,12 @@ const Hero = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
-              <h3 className="text-base font-semibold text-gray-900 mb-2">Bank-Level Security</h3>
-              <p className="text-sm text-gray-600">Your medical data is protected with enterprise-grade encryption</p>
+              <h3 className="text-base font-semibold text-gray-900 mb-2">
+                <TranslatedText>Bank-Level Security</TranslatedText>
+              </h3>
+              <p className="text-sm text-gray-600">
+                <TranslatedText>Your medical data is protected with enterprise-grade encryption</TranslatedText>
+              </p>
             </div>
             <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-5 border border-white/20 shadow-lg">
               <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
@@ -71,8 +82,12 @@ const Hero = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-base font-semibold text-gray-900 mb-2">Instant Access</h3>
-              <p className="text-sm text-gray-600">Access your health records anytime, anywhere, on any device</p>
+              <h3 className="text-base font-semibold text-gray-900 mb-2">
+                <TranslatedText>Instant Access</TranslatedText>
+              </h3>
+              <p className="text-sm text-gray-600">
+                <TranslatedText>Access your health records anytime, anywhere, on any device</TranslatedText>
+              </p>
             </div>
             <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-5 border border-white/20 shadow-lg">
               <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-3">
@@ -80,8 +95,12 @@ const Hero = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <h3 className="text-base font-semibold text-gray-900 mb-2">Connected Care</h3>
-              <p className="text-sm text-gray-600">Seamlessly connect with healthcare providers nationwide</p>
+              <h3 className="text-base font-semibold text-gray-900 mb-2">
+                <TranslatedText>Connected Care</TranslatedText>
+              </h3>
+              <p className="text-sm text-gray-600">
+                <TranslatedText>Seamlessly connect with healthcare providers nationwide</TranslatedText>
+              </p>
             </div>
           </div>
         </div>

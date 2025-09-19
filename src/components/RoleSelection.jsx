@@ -1,6 +1,8 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser, useClerk } from '@clerk/clerk-react'
+import TranslatedText from './TranslatedText'
+import LanguageSelector from './LanguageSelector'
 
 const RoleSelection = () => {
   const navigate = useNavigate()
@@ -93,15 +95,18 @@ const RoleSelection = () => {
                 MediHub
               </h1>
             </div>
-            <button
-              onClick={handleBackToHome}
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 font-medium transition-colors duration-200"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              <span>Back to Home</span>
-            </button>
+            <div className="flex items-center space-x-4">
+              <LanguageSelector variant="compact" />
+              <button
+                onClick={handleBackToHome}
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 font-medium transition-colors duration-200"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <span><TranslatedText>Back to Home</TranslatedText></span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -117,11 +122,13 @@ const RoleSelection = () => {
               </svg>
             </div>
             <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-              Choose Your <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Role</span>
+              <TranslatedText>Choose Your</TranslatedText> <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"><TranslatedText>Role</TranslatedText></span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Select your role to access the appropriate MediHub features and services. 
-              Join our comprehensive healthcare ecosystem designed for modern medical practice.
+              <TranslatedText>
+                Select your role to access the appropriate MediHub features and services. 
+                Join our comprehensive healthcare ecosystem designed for modern medical practice.
+              </TranslatedText>
             </p>
           </div>
 
@@ -151,7 +158,7 @@ const RoleSelection = () => {
                       {role.icon}
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900">
-                      {role.name}
+                      <TranslatedText>{role.name}</TranslatedText>
                     </h3>
                   </div>
                 </div>
@@ -162,10 +169,14 @@ const RoleSelection = () => {
           {/* Additional Info */}
           <div className="text-center mt-16">
             <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 border border-white/20 shadow-lg max-w-2xl mx-auto">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">New to MediHub?</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                <TranslatedText>New to MediHub?</TranslatedText>
+              </h3>
               <p className="text-gray-600 leading-relaxed">
-                Our platform connects all healthcare stakeholders in a secure, unified ecosystem. 
-                Choose your role above to get started with features tailored specifically for your needs.
+                <TranslatedText>
+                  Our platform connects all healthcare stakeholders in a secure, unified ecosystem. 
+                  Choose your role above to get started with features tailored specifically for your needs.
+                </TranslatedText>
               </p>
             </div>
           </div>

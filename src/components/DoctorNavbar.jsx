@@ -1,4 +1,6 @@
 import React from 'react'
+import TranslatedText from './TranslatedText'
+import LanguageSelector from './LanguageSelector'
 
 const DoctorNavbar = ({ doctorName, currentView, onNavigate, onSignOut }) => {
   return (
@@ -12,6 +14,7 @@ const DoctorNavbar = ({ doctorName, currentView, onNavigate, onSignOut }) => {
 
           {/* Navigation Buttons */}
           <div className="flex items-center space-x-4">
+            <LanguageSelector variant="compact" />
             <button
               onClick={() => onNavigate('dashboard')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -20,7 +23,7 @@ const DoctorNavbar = ({ doctorName, currentView, onNavigate, onSignOut }) => {
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
-              Dashboard
+              <TranslatedText>Dashboard</TranslatedText>
             </button>
             
             <button
@@ -31,14 +34,14 @@ const DoctorNavbar = ({ doctorName, currentView, onNavigate, onSignOut }) => {
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
-              Personal Info
+              <TranslatedText>Personal Info</TranslatedText>
             </button>
 
             <button
               onClick={onSignOut}
               className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
             >
-              Sign Out
+              <TranslatedText>Sign Out</TranslatedText>
             </button>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import React from 'react'
+import TranslatedText from './TranslatedText'
 
 const Features = () => {
   const features = [
@@ -44,10 +45,10 @@ const Features = () => {
                 {feature.icon}
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                {feature.title}
+                <TranslatedText>{feature.title}</TranslatedText>
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                {feature.description}
+                <TranslatedText>{feature.description}</TranslatedText>
               </p>
             </div>
           ))}

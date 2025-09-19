@@ -1,5 +1,6 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
+import { TranslationProvider } from './contexts/TranslationContext'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Features from './components/Features'
@@ -34,24 +35,26 @@ function App() {
 
 function AppWithRoutes() {
   return (
-    <Routes>
-      <Route path="/" element={<App />} />
-      <Route path="/roles" element={<RoleSelection />} />
-      <Route path="/auth/patient" element={<PatientAuthPage />} />
-      <Route path="/auth/doctor" element={<DoctorAuthPage />} />
-      <Route path="/auth/hospital" element={<HospitalAuthPage />} />
-      <Route path="/auth/lab" element={<LabAuthPage />} />
-      <Route path="/auth/doctor/sign-in" element={<DoctorSignInPage />} />
-      <Route path="/auth/hospital/sign-in" element={<HospitalSignInPage />} />
-      <Route path="/auth/lab/sign-in" element={<LabSignInPage />} />
-      <Route path="/profile/doctor" element={<DoctorProfileForm />} />
-      <Route path="/profile/hospital" element={<HospitalProfileForm />} />
-      <Route path="/profile/lab" element={<LabProfileForm />} />
-      <Route path="/dashboard/patient" element={<PatientDashboard />} />
-      <Route path="/dashboard/doctor" element={<DoctorDashboard />} />
-      <Route path="/dashboard/hospital" element={<HospitalDashboard />} />
-      <Route path="/dashboard/lab" element={<LabDashboard />} />
-    </Routes>
+    <TranslationProvider>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/roles" element={<RoleSelection />} />
+        <Route path="/auth/patient" element={<PatientAuthPage />} />
+        <Route path="/auth/doctor" element={<DoctorAuthPage />} />
+        <Route path="/auth/hospital" element={<HospitalAuthPage />} />
+        <Route path="/auth/lab" element={<LabAuthPage />} />
+        <Route path="/auth/doctor/sign-in" element={<DoctorSignInPage />} />
+        <Route path="/auth/hospital/sign-in" element={<HospitalSignInPage />} />
+        <Route path="/auth/lab/sign-in" element={<LabSignInPage />} />
+        <Route path="/profile/doctor" element={<DoctorProfileForm />} />
+        <Route path="/profile/hospital" element={<HospitalProfileForm />} />
+        <Route path="/profile/lab" element={<LabProfileForm />} />
+        <Route path="/dashboard/patient" element={<PatientDashboard />} />
+        <Route path="/dashboard/doctor" element={<DoctorDashboard />} />
+        <Route path="/dashboard/hospital" element={<HospitalDashboard />} />
+        <Route path="/dashboard/lab" element={<LabDashboard />} />
+      </Routes>
+    </TranslationProvider>
   )
 }
 

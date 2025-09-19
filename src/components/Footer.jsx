@@ -1,4 +1,5 @@
 import React from 'react'
+import TranslatedText from './TranslatedText'
 
 const Footer = () => {
   return (
@@ -6,7 +7,7 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <p className="text-gray-600">
-            © 2025 MediHub. All rights reserved.
+            <TranslatedText>© 2025 MediHub. All rights reserved.</TranslatedText>
           </p>
         </div>
       </div>

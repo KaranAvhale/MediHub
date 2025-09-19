@@ -6,6 +6,7 @@ import DoctorNavbar from '../components/DoctorNavbar'
 import AttendPatientModal from '../components/AttendPatientModal'
 import PatientDetailsView from '../components/PatientDetailsView'
 import DoctorEditProfileModal from '../components/DoctorEditProfileModal'
+import TranslatedText from '../components/TranslatedText'
 
 const DoctorDashboard = () => {
   const { user: clerkUser } = useUser()

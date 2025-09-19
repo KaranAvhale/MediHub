@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { generatePatientSummary, answerPatientQuestion } from '../utils/geminiApi'
+import { useTranslation } from '../contexts/TranslationContext'
+import { useTranslate } from '../hooks/useTranslate'
+import TranslatedText from './TranslatedText'
 
 const PatientAIAssistant = ({ patient }) => {
+  const { currentLanguage, isRTL } = useTranslation()
+  const { t } = useTranslate()
+  
   const [summary, setSummary] = useState(null)
   const [isLoadingSummary, setIsLoadingSummary] = useState(false)
   const [summaryError, setSummaryError] = useState(null)
@@ -48,7 +54,16 @@ const PatientAIAssistant = ({ patient }) => {
       const recognition = new SpeechRecognition()
       recognition.continuous = false
       recognition.interimResults = false
-      recognition.lang = 'en-US'
+      recognition.lang = currentLanguage === 'en' ? 'en-US' : 
+                        currentLanguage === 'es' ? 'es-ES' :
+                        currentLanguage === 'fr' ? 'fr-FR' :
+                        currentLanguage === 'de' ? 'de-DE' :
+                        currentLanguage === 'hi' ? 'hi-IN' :
+                        currentLanguage === 'zh' ? 'zh-CN' :
+                        currentLanguage === 'ja' ? 'ja-JP' :
+                        currentLanguage === 'ko' ? 'ko-KR' :
+                        currentLanguage === 'ar' ? 'ar-SA' :
+                        'en-US'
       
       recognition.onstart = () => {
         setIsListening(true)
@@ -78,7 +93,7 @@ const PatientAIAssistant = ({ patient }) => {
     if ('speechSynthesis' in window) {
       speechSynthesisRef.current = window.speechSynthesis
     }
-  }, [])
+  }, [currentLanguage])
 
   // Remove automatic summary generation - now requires user to click Start
 
@@ -118,15 +133,37 @@ const PatientAIAssistant = ({ patient }) => {
   }
 
   // Text-to-speech functions
-  const speakText = (text) => {
+  const speakText = async (text) => {
     if (speechSynthesisRef.current && text) {
       // Stop any current speech
       speechSynthesisRef.current.cancel()
       
-      const utterance = new SpeechSynthesisUtterance(text)
+      // Translate text if needed
+      let textToSpeak = text
+      if (currentLanguage !== 'en') {
+        try {
+          textToSpeak = await t(text)
+        } catch (error) {
+          console.error('Translation error for speech:', error)
+        }
+      }
+      
+      const utterance = new SpeechSynthesisUtterance(textToSpeak)
       utterance.rate = 0.9
       utterance.pitch = 1
       utterance.volume = 0.8
+      
+      // Set language for speech synthesis
+      utterance.lang = currentLanguage === 'en' ? 'en-US' : 
+                      currentLanguage === 'es' ? 'es-ES' :
+                      currentLanguage === 'fr' ? 'fr-FR' :
+                      currentLanguage === 'de' ? 'de-DE' :
+                      currentLanguage === 'hi' ? 'hi-IN' :
+                      currentLanguage === 'zh' ? 'zh-CN' :
+                      currentLanguage === 'ja' ? 'ja-JP' :
+                      currentLanguage === 'ko' ? 'ko-KR' :
+                      currentLanguage === 'ar' ? 'ar-SA' :
+                      'en-US'
       
       utterance.onstart = () => {
         setIsSpeaking(true)
@@ -183,10 +220,21 @@ const PatientAIAssistant = ({ patient }) => {
     try {
       const result = await answerPatientQuestion(question, patient, chatMessages)
       
+      // Translate AI response if needed
+      let translatedAnswer = result.answer
+      if (currentLanguage !== 'en') {
+        try {
+          translatedAnswer = await t(result.answer)
+        } catch (translationError) {
+          console.error('Translation error for AI response:', translationError)
+        }
+      }
+      
       // Add AI response to chat
       const aiMessage = {
         type: 'answer',
-        content: result.answer,
+        content: translatedAnswer,
+        originalContent: result.answer,
         data: result,
         timestamp: new Date().toISOString()
       }
@@ -276,8 +324,12 @@ const PatientAIAssistant = ({ patient }) => {
             </svg>
           </div>
           <div>
-            <h3 className="text-2xl font-bold text-gray-900">AI Medical Assistant</h3>
-            <p className="text-gray-600">Intelligent analysis and insights for {patient?.name}</p>
+            <h3 className="text-2xl font-bold text-gray-900">
+              <TranslatedText>AI Medical Assistant</TranslatedText>
+            </h3>
+            <p className="text-gray-600">
+              <TranslatedText>Intelligent analysis and insights for</TranslatedText> {patient?.name}
+            </p>
           </div>
         </div>
         <button
@@ -287,7 +339,7 @@ const PatientAIAssistant = ({ patient }) => {
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
-          Ask AI
+          <TranslatedText>Ask AI</TranslatedText>
         </button>
       </div>
 
@@ -295,7 +347,9 @@ const PatientAIAssistant = ({ patient }) => {
         {/* AI Summary Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h4 className="text-lg font-semibold text-gray-900">Medical Summary & Insights</h4>
+            <h4 className="text-lg font-semibold text-gray-900">
+              <TranslatedText>Medical Summary & Insights</TranslatedText>
+            </h4>
             <button
               onClick={generateAISummary}
               disabled={isLoadingSummary}
@@ -304,7 +358,7 @@ const PatientAIAssistant = ({ patient }) => {
               <svg className={`w-4 h-4 mr-1 ${isLoadingSummary ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-              {isLoadingSummary ? 'Analyzing...' : 'Refresh'}
+              {isLoadingSummary ? <TranslatedText>Analyzing...</TranslatedText> : <TranslatedText>Refresh</TranslatedText>}
             </button>
           </div>
 
@@ -312,7 +366,9 @@ const PatientAIAssistant = ({ patient }) => {
             {isLoadingSummary && (
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-                <span className="ml-3 text-gray-600">Generating AI insights...</span>
+                <span className="ml-3 text-gray-600">
+                  <TranslatedText>Generating AI insights...</TranslatedText>
+                </span>
               </div>
             )}
 

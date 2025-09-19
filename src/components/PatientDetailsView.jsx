@@ -5,8 +5,13 @@ import TreatmentHistoryModal from './TreatmentHistoryModal'
 import DoctorHospitalAdmissions from './DoctorHospitalAdmissions'
 import PrescriptionPrint from './PrescriptionPrint'
 import PatientAIAssistant from './PatientAIAssistant'
+import TranslatedText from './TranslatedText'
+import { useTranslate } from '../hooks/useTranslate'
+import { useDatabaseTranslation } from '../utils/databaseTranslation'
 
 const PatientDetailsView = ({ patient, onBack }) => {
+  const { t } = useTranslate()
+  const { translateMedicalTerm, translatePatientData } = useDatabaseTranslation()
   const [currentPatient, setCurrentPatient] = useState(patient)
   const [showTreatmentModal, setShowTreatmentModal] = useState(false)
   const [selectedTreatment, setSelectedTreatment] = useState(null)
@@ -101,7 +106,8 @@ const PatientDetailsView = ({ patient, onBack }) => {
   }
 
   const handleRemoveTreatment = async (treatment) => {
-    if (!confirm('Are you sure you want to remove this treatment?')) return
+    const confirmMessage = await t('Are you sure you want to remove this treatment?')
+    if (!confirm(confirmMessage)) return
 
     try {
       const { data: currentPatientData, error: fetchError } = await supabase
@@ -175,7 +181,8 @@ const PatientDetailsView = ({ patient, onBack }) => {
   }
 
   const handleMarkCompleted = async (treatment) => {
-    if (!confirm('Mark this treatment as completed?')) return
+    const confirmMessage = await t('Mark this treatment as completed?')
+    if (!confirm(confirmMessage)) return
 
     try {
       const { data: currentPatientData, error: fetchError } = await supabase
@@ -418,7 +425,7 @@ const PatientDetailsView = ({ patient, onBack }) => {
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            History
+            <TranslatedText>History</TranslatedText>
           </button>
           <button
             onClick={() => onPrintPrescription(treatment)}
@@ -428,7 +435,7 @@ const PatientDetailsView = ({ patient, onBack }) => {
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a1 1 0 001-1v-4a1 1 0 00-1-1H9a1 1 0 00-1 1v4a1 1 0 001 1zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
             </svg>
-            Print
+            <TranslatedText>Print</TranslatedText>
           </button>
           <button
             onClick={() => onMarkCompleted(treatment)}
@@ -437,7 +444,7 @@ const PatientDetailsView = ({ patient, onBack }) => {
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-            Mark Completed
+            <TranslatedText>Mark Completed</TranslatedText>
           </button>
           <button
             onClick={() => onRemove(treatment)}
@@ -547,11 +554,11 @@ const PatientDetailsView = ({ patient, onBack }) => {
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Back to Dashboard
+              <TranslatedText>Back to Dashboard</TranslatedText>
             </button>
             <div className="flex items-center space-x-4">
               <div className="text-right">
-                <h1 className="text-xl font-bold text-gray-900">Patient Details</h1>
+                <h1 className="text-xl font-bold text-gray-900"><TranslatedText>Patient Details</TranslatedText></h1>
                 <p className="text-sm text-gray-600">{currentPatient.name}</p>
               </div>
               <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -569,8 +576,8 @@ const PatientDetailsView = ({ patient, onBack }) => {
           {/* Patient Header */}
           <div className="mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Medical Information</h2>
-              <p className="text-gray-600 mt-1">Comprehensive medical information</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2"><TranslatedText>Medical Information</TranslatedText></h2>
+              <p className="text-gray-600 mt-1"><TranslatedText>Comprehensive medical information</TranslatedText></p>
             </div>
           </div>
 
@@ -605,7 +612,7 @@ const PatientDetailsView = ({ patient, onBack }) => {
                   <svg className="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
-                  <h4 className="text-sm font-semibold text-blue-800">Contact</h4>
+                  <h4 className="text-sm font-semibold text-blue-800"><TranslatedText>Contact</TranslatedText></h4>
                 </div>
                 <p className="text-blue-900 font-medium">{currentPatient.contact}</p>
               </div>
@@ -615,7 +622,7 @@ const PatientDetailsView = ({ patient, onBack }) => {
                   <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
-                  <h4 className="text-sm font-semibold text-green-800">Blood Group</h4>
+                  <h4 className="text-sm font-semibold text-green-800"><TranslatedText>Blood Group</TranslatedText></h4>
                 </div>
                 <p className="text-green-900 font-medium">{currentPatient.bloodGroup}</p>
               </div>
@@ -625,7 +632,7 @@ const PatientDetailsView = ({ patient, onBack }) => {
                   <svg className="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a4 4 0 118 0v4m-4 6v6m-4-6h8m-8 0H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2v-6a2 2 0 00-2-2h-4" />
                   </svg>
-                  <h4 className="text-sm font-semibold text-purple-800">Age</h4>
+                  <h4 className="text-sm font-semibold text-purple-800"><TranslatedText>Age</TranslatedText></h4>
                 </div>
                 <p className="text-purple-900 font-medium">{currentPatient.age} years</p>
               </div>
@@ -636,7 +643,7 @@ const PatientDetailsView = ({ patient, onBack }) => {
                     <svg className="w-5 h-5 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a4 4 0 118 0v4m-4 6v6m-4-6h8m-8 0H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2v-6a2 2 0 00-2-2h-4" />
                     </svg>
-                    <h4 className="text-sm font-semibold text-orange-800">Date of Birth</h4>
+                    <h4 className="text-sm font-semibold text-orange-800"><TranslatedText>Date of Birth</TranslatedText></h4>
                   </div>
                   <p className="text-orange-900 font-medium">{new Date(currentPatient.dob).toLocaleDateString()}</p>
                 </div>

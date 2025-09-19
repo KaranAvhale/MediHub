@@ -2,8 +2,13 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import BackToRoles from '../components/BackToRoles'
+import TranslatedText from '../components/TranslatedText'
+import TranslatedInput from '../components/TranslatedInput'
+import LanguageSelector from '../components/LanguageSelector'
+import { useTranslate } from '../hooks/useTranslate'
 
 const PatientSignIn = () => {
+  const { t } = useTranslate()
   const [aadharNumber, setAadharNumber] = useState('')
   const [aadharOtp, setAadharOtp] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -29,7 +34,8 @@ const PatientSignIn = () => {
       }
 
       if (!data) {
-        setError('Invalid Aadhaar number or OTP. Please try again.')
+        const errorMsg = await t('Invalid Aadhaar number or OTP. Please try again.')
+        setError(errorMsg)
         return
       }
 
@@ -39,7 +45,8 @@ const PatientSignIn = () => {
       navigate('/dashboard/patient')
     } catch (err) {
       console.error('Sign-in error:', err)
-      setError('Invalid Aadhaar number or OTP. Please try again.')
+      const errorMsg = await t('Invalid Aadhaar number or OTP. Please try again.')
+      setError(errorMsg)
     } finally {
       setIsLoading(false)
     }
@@ -59,7 +66,10 @@ const PatientSignIn = () => {
                 MediHub
               </h1>
             </div>
-            <BackToRoles />
+            <div className="flex items-center space-x-4">
+              <LanguageSelector variant="compact" />
+              <BackToRoles />
+            </div>
           </div>
         </div>
       </header>
@@ -78,10 +88,12 @@ const PatientSignIn = () => {
                   </svg>
                 </div>
                 <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-                  Welcome Back, <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Patient</span>
+                  <TranslatedText>Welcome Back,</TranslatedText> <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"><TranslatedText>Patient</TranslatedText></span>
                 </h2>
                 <p className="text-xl text-gray-600 leading-relaxed mb-8">
-                  Sign in to access your health records securely with Aadhaar authentication. View your medical history and manage your healthcare journey.
+                  <TranslatedText>
+                    Sign in to access your health records securely with Aadhaar authentication. View your medical history and manage your healthcare journey.
+                  </TranslatedText>
                 </p>
               </div>
             </div>
@@ -94,58 +106,34 @@ const PatientSignIn = () => {
             {/* Sign In Card */}
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
-                <h3 className="text-white font-semibold text-lg">Sign In to Your Account</h3>
-                <p className="text-blue-100 text-sm">Access your health records</p>
+                <h3 className="text-white font-semibold text-lg"><TranslatedText>Sign In to Your Account</TranslatedText></h3>
+                <p className="text-blue-100 text-sm"><TranslatedText>Access your health records</TranslatedText></p>
               </div>
               <div className="p-6">
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Aadhaar Number */}
-                  <div>
-                    <label htmlFor="aadharNumber" className="block text-sm font-semibold text-gray-700 mb-3">
-                      Aadhaar Number
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V4a2 2 0 114 0v2m-4 0a2 2 0 104 0m-4 0v2m4-2v2" />
-                        </svg>
-                      </div>
-                      <input
-                        type="text"
-                        id="aadharNumber"
-                        value={aadharNumber}
-                        onChange={(e) => setAadharNumber(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg transition-all duration-200"
-                        placeholder="Enter your 12-digit Aadhaar number"
-                        required
-                        maxLength={12}
-                        pattern="[0-9]{12}"
-                      />
-                    </div>
-                  </div>
+                  <TranslatedInput
+                    label="Aadhaar Number"
+                    placeholder="Enter your 12-digit Aadhaar number"
+                    type="text"
+                    value={aadharNumber}
+                    onChange={(e) => setAadharNumber(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg transition-all duration-200"
+                    required
+                    maxLength={12}
+                    pattern="[0-9]{12}"
+                  />
 
                   {/* Aadhaar OTP */}
-                  <div>
-                    <label htmlFor="aadharOtp" className="block text-sm font-semibold text-gray-700 mb-3">
-                      Aadhaar OTP
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
-                      </div>
-                      <input
-                        type="password"
-                        id="aadharOtp"
-                        value={aadharOtp}
-                        onChange={(e) => setAadharOtp(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg transition-all duration-200"
-                        placeholder="Enter your Aadhaar OTP"
-                        required
-                      />
-                    </div>
-                  </div>
+                  <TranslatedInput
+                    label="Aadhaar OTP"
+                    placeholder="Enter your Aadhaar OTP"
+                    type="password"
+                    value={aadharOtp}
+                    onChange={(e) => setAadharOtp(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg transition-all duration-200"
+                    required
+                  />
 
                   {/* Error Message */}
                   {error && (
@@ -171,14 +159,14 @@ const PatientSignIn = () => {
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        Signing In...
+                        <TranslatedText>Signing In...</TranslatedText>
                       </div>
                     ) : (
                       <div className="flex items-center justify-center">
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                         </svg>
-                        Sign In Securely
+                        <TranslatedText>Sign In Securely</TranslatedText>
                       </div>
                     )}
                   </button>

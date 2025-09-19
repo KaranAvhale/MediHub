@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabaseClient'
 import HospitalNavbar from '../components/HospitalNavbar'
 import HospitalInfo from '../components/HospitalInfo'
 import HospitalReports from '../components/HospitalReports'
+import TranslatedText from '../components/TranslatedText'
 
 const HospitalDashboard = () => {
   const { user } = useUser()

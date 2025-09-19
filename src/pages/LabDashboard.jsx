@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabaseClient'
 import LabNavbar from '../components/LabNavbar'
 import LabInfo from '../components/LabInfo'
 import LabReports from '../components/LabReports'
+import TranslatedText from '../components/TranslatedText'
 
 const LabDashboard = () => {
   const { user } = useUser()

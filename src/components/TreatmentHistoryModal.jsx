@@ -1,11 +1,17 @@
 import React from 'react'
+import TranslatedText from './TranslatedText'
+import { useTranslate } from '../hooks/useTranslate'
+import { useDatabaseTranslation } from '../utils/databaseTranslation'
 
 const TreatmentHistoryModal = ({ isOpen, onClose, treatment, treatmentHistory = [] }) => {
+  const { t } = useTranslate()
+  const { translateMedicalTerm } = useDatabaseTranslation()
+  
   if (!isOpen) return null
 
-  const treatmentName = typeof treatment === 'string' 
-    ? treatment 
-    : treatment?.treatmentName || treatment?.name || 'Treatment'
+  // Use translated name if available, otherwise fallback to original
+  const treatmentName = treatment?.displayName || 
+    (typeof treatment === 'string' ? treatment : treatment?.treatmentName || treatment?.name || 'Treatment')
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -20,7 +26,7 @@ const TreatmentHistoryModal = ({ isOpen, onClose, treatment, treatmentHistory = 
                 </svg>
               </div>
               <div>
-                <h2 className="text-2xl font-bold">Treatment History</h2>
+                <h2 className="text-2xl font-bold"><TranslatedText>Treatment History</TranslatedText></h2>
                 <p className="text-indigo-100 text-sm">{treatmentName}</p>
               </div>
             </div>
@@ -48,7 +54,7 @@ const TreatmentHistoryModal = ({ isOpen, onClose, treatment, treatmentHistory = 
                 </div>
                 <div>
                   <h3 className={`font-semibold ${treatment?.isPastTreatment ? 'text-green-900' : 'text-blue-900'}`}>
-                    {treatment?.isPastTreatment ? 'Completed Treatment' : 'Current Treatment'}
+                    {treatment?.isPastTreatment ? <TranslatedText>Completed Treatment</TranslatedText> : <TranslatedText>Current Treatment</TranslatedText>}
                   </h3>
                   <p className={`text-sm ${treatment?.isPastTreatment ? 'text-green-700' : 'text-blue-700'}`}>{treatmentName}</p>
                 </div>
@@ -59,36 +65,40 @@ const TreatmentHistoryModal = ({ isOpen, onClose, treatment, treatmentHistory = 
                 {typeof treatment === 'object' && (
                   <>
                     {treatment.description && (
-                      <p className={`${treatment?.isPastTreatment ? 'text-green-700' : 'text-blue-700'} mb-3`}>{treatment.description}</p>
+                      <p className={`${treatment?.isPastTreatment ? 'text-green-700' : 'text-blue-700'} mb-3`}>
+                        {treatment.displayDescription || treatment.description}
+                      </p>
                     )}
                     
                     {treatment.startDate && (
                       <p className={`text-sm ${treatment?.isPastTreatment ? 'text-green-600' : 'text-blue-600'} mb-2`}>
-                        <span className="font-medium">Started:</span> {new Date(treatment.startDate).toLocaleDateString()}
+                        <span className="font-medium"><TranslatedText>Started:</TranslatedText></span> {new Date(treatment.startDate).toLocaleDateString()}
                       </p>
                     )}
                     
                     {treatment.followUpDate && (
                       <p className={`text-sm ${treatment?.isPastTreatment ? 'text-green-600' : 'text-blue-600'} mb-2`}>
-                        <span className="font-medium">Follow-up:</span> {new Date(treatment.followUpDate).toLocaleDateString()}
+                        <span className="font-medium"><TranslatedText>Follow-up:</TranslatedText></span> {new Date(treatment.followUpDate).toLocaleDateString()}
                       </p>
                     )}
                     
                     {treatment.completedDate && (
                       <p className={`text-sm ${treatment?.isPastTreatment ? 'text-green-600' : 'text-blue-600'} mb-2 font-medium`}>
-                        <span className="font-medium">Completed:</span> {new Date(treatment.completedDate).toLocaleDateString()}
+                        <span className="font-medium"><TranslatedText>Completed:</TranslatedText></span> {new Date(treatment.completedDate).toLocaleDateString()}
                       </p>
                     )}
                     
                     {treatment.prescriptions && treatment.prescriptions.length > 0 && (
                       <div className="mt-3">
                         <h5 className={`font-medium ${treatment?.isPastTreatment ? 'text-green-800' : 'text-blue-800'} mb-2`}>
-                          {treatment?.isPastTreatment ? 'Final Prescriptions:' : 'Current Prescriptions:'}
+                          {treatment?.isPastTreatment ? <TranslatedText>Final Prescriptions:</TranslatedText> : <TranslatedText>Current Prescriptions:</TranslatedText>}
                         </h5>
                         <div className="space-y-2">
                           {treatment.prescriptions.map((prescription, index) => (
                             <div key={index} className={`${treatment?.isPastTreatment ? 'bg-green-50 border-green-200' : 'bg-blue-50 border-blue-200'} rounded-lg p-3 border`}>
-                              <p className={`font-medium ${treatment?.isPastTreatment ? 'text-green-900' : 'text-blue-900'}`}>{prescription.medicineName}</p>
+                              <p className={`font-medium ${treatment?.isPastTreatment ? 'text-green-900' : 'text-blue-900'}`}>
+                                {prescription.displayMedicineName || prescription.medicineName}
+                              </p>
                               <p className={`text-sm ${treatment?.isPastTreatment ? 'text-green-700' : 'text-blue-700'}`}>
                                 {prescription.dose} {prescription.quantity && `• Qty: ${prescription.quantity}`} {prescription.frequency && prescription.frequency.length > 0 && 
                                   `• ${prescription.frequency.join(', ')}`}
@@ -101,16 +111,16 @@ const TreatmentHistoryModal = ({ isOpen, onClose, treatment, treatmentHistory = 
                     
                     {treatment.notes && (
                       <div className="mt-3">
-                        <h5 className={`font-medium ${treatment?.isPastTreatment ? 'text-green-800' : 'text-blue-800'} mb-2`}>Notes:</h5>
+                        <h5 className={`font-medium ${treatment?.isPastTreatment ? 'text-green-800' : 'text-blue-800'} mb-2`}><TranslatedText>Notes:</TranslatedText></h5>
                         <p className={`${treatment?.isPastTreatment ? 'text-green-700 bg-green-50 border-green-200' : 'text-blue-700 bg-blue-50 border-blue-200'} rounded-lg p-3 border`}>
-                          {treatment.notes}
+                          {treatment.displayNotes || treatment.notes}
                         </p>
                       </div>
                     )}
 
                     {treatment.attachedReports && treatment.attachedReports.length > 0 && (
                       <div className="mt-3">
-                        <h5 className={`font-medium ${treatment?.isPastTreatment ? 'text-green-800' : 'text-blue-800'} mb-2`}>Attached Reports:</h5>
+                        <h5 className={`font-medium ${treatment?.isPastTreatment ? 'text-green-800' : 'text-blue-800'} mb-2`}><TranslatedText>Attached Reports:</TranslatedText></h5>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           {treatment.attachedReports.map((report, rIndex) => {
                             const reportObj = typeof report === 'string' ? { name: report, url: report } : report;
@@ -119,11 +129,12 @@ const TreatmentHistoryModal = ({ isOpen, onClose, treatment, treatmentHistory = 
                             return (
                               <button
                                 key={rIndex}
-                                onClick={() => {
+                                onClick={async () => {
                                   if (reportObj?.url && reportObj.url.startsWith('http')) {
                                     window.open(reportObj.url, '_blank');
                                   } else {
-                                    alert('Report URL not available');
+                                    const errorMsg = await t('Report URL not available');
+                                    alert(errorMsg);
                                   }
                                 }}
                                 className="bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between cursor-pointer"
@@ -150,7 +161,7 @@ const TreatmentHistoryModal = ({ isOpen, onClose, treatment, treatmentHistory = 
                   <svg className="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  Past Updates
+                  <TranslatedText>Past Updates</TranslatedText>
                 </h3>
                 
                 <div className="relative">
@@ -167,7 +178,7 @@ const TreatmentHistoryModal = ({ isOpen, onClose, treatment, treatmentHistory = 
                         <div className="ml-10 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6 border border-gray-200 w-full">
                           <div className="flex items-center justify-between mb-3">
                             <h4 className="font-semibold text-gray-900">
-                              Update #{treatmentHistory.length - index}
+                              <TranslatedText>Update</TranslatedText> #{treatmentHistory.length - index}
                             </h4>
                             <span className="text-sm text-gray-500">
                               {historyItem.updatedAt || historyItem.movedToHistoryAt ? new Date(historyItem.updatedAt || historyItem.movedToHistoryAt).toLocaleDateString('en-US', {
@@ -186,7 +197,7 @@ const TreatmentHistoryModal = ({ isOpen, onClose, treatment, treatmentHistory = 
                           
                           {historyItem.prescriptions && historyItem.prescriptions.length > 0 && (
                             <div className="mb-3">
-                              <h5 className="font-medium text-gray-800 mb-2">Prescriptions:</h5>
+                              <h5 className="font-medium text-gray-800 mb-2"><TranslatedText>Prescriptions:</TranslatedText></h5>
                               <div className="space-y-2">
                                 {historyItem.prescriptions.map((prescription, pIndex) => (
                                   <div key={pIndex} className="bg-white rounded-lg p-3 border border-gray-200">
@@ -203,7 +214,7 @@ const TreatmentHistoryModal = ({ isOpen, onClose, treatment, treatmentHistory = 
                           
                           {historyItem.notes && (
                             <div className="mb-3">
-                              <h5 className="font-medium text-gray-800 mb-2">Notes:</h5>
+                              <h5 className="font-medium text-gray-800 mb-2"><TranslatedText>Notes:</TranslatedText></h5>
                               <p className="text-gray-700 bg-white rounded-lg p-3 border border-gray-200">
                                 {historyItem.notes}
                               </p>
@@ -212,7 +223,7 @@ const TreatmentHistoryModal = ({ isOpen, onClose, treatment, treatmentHistory = 
                           
                           {historyItem.attachedReports && historyItem.attachedReports.length > 0 && (
                             <div>
-                              <h5 className="font-medium text-gray-800 mb-2">Attached Reports:</h5>
+                              <h5 className="font-medium text-gray-800 mb-2"><TranslatedText>Attached Reports:</TranslatedText></h5>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 {historyItem.attachedReports.map((report, rIndex) => {
                                   const reportObj = typeof report === 'string' ? { name: report, url: report } : report;
@@ -221,11 +232,12 @@ const TreatmentHistoryModal = ({ isOpen, onClose, treatment, treatmentHistory = 
                                   return (
                                     <button
                                       key={rIndex}
-                                      onClick={() => {
+                                      onClick={async () => {
                                         if (reportObj?.url && reportObj.url.startsWith('http')) {
                                           window.open(reportObj.url, '_blank');
                                         } else {
-                                          alert('Report URL not available');
+                                          const errorMsg = await t('Report URL not available');
+                                          alert(errorMsg);
                                         }
                                       }}
                                       className="bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between cursor-pointer"
@@ -256,9 +268,9 @@ const TreatmentHistoryModal = ({ isOpen, onClose, treatment, treatmentHistory = 
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">No Past Updates</h4>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2"><TranslatedText>No Past Updates</TranslatedText></h4>
                 <p className="text-gray-600 max-w-md mx-auto">
-                  This treatment has no past updates yet. History will appear here when the treatment is modified.
+                  <TranslatedText>This treatment has no past updates yet. History will appear here when the treatment is modified.</TranslatedText>
                 </p>
               </div>
             )}
@@ -271,7 +283,7 @@ const TreatmentHistoryModal = ({ isOpen, onClose, treatment, treatmentHistory = 
             onClick={onClose}
             className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-medium transition-colors"
           >
-            Close
+            <TranslatedText>Close</TranslatedText>
           </button>
         </div>
       </div>
