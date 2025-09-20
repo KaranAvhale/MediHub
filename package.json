@@ -13,8 +13,10 @@
     "@google-cloud/translate": "^8.0.2",
     "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.56.0",
+    "chart.js": "^4.5.0",
     "html2pdf.js": "^0.12.0",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.3.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.62.0",
     "react-router-dom": "^7.8.2"
